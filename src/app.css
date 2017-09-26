@@ -1,0 +1,9 @@
+body {
+  margin: 0;
+}
+#viewer {
+  height: 100vh;
+}
+.leaflet-container {
+  background: transparent;
+}
