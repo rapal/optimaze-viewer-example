@@ -8,5 +8,5 @@ Note: The API which this application uses is not yet published but will be publi
 ## Usage
 
 1. Run `yarn` to install dependencies
-2. Run `yarn start` to start dev server
-3. Alternatively, run `yarn build` and open `index.html`
+2. Run `yarn build`
+3. Open `index.html`

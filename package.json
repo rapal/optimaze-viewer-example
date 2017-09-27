@@ -22,11 +22,10 @@
     "ts-loader": "^2.3.7",
     "tslint": "^5.7.0",
     "typescript": "^2.5.2",
-    "webpack": "^3.6.0",
-    "webpack-dev-server": "^2.8.2"
+    "webpack": "^3.6.0"
   },
   "dependencies": {
-    "@rapal/optimaze-viewer": "^0.1.0",
+    "@rapal/optimaze-viewer": "^0.2.0",
     "@types/leaflet": "^1.2.0",
     "@types/q": "^1.0.5",
     "leaflet": "^1.2.0",
