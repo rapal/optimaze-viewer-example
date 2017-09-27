@@ -54,13 +54,17 @@ Q.all([
 
   // Creating custom panes is not neccessary, but makes sure
   // that elements of the same type are shown at the same z-index
-  viewer.createPane("seats");
+  viewer.createPane("spaces").style.zIndex = "405";
+  viewer.createPane("seats").style.zIndex = "410";
 
   // Create selectable space layers
   const spaceLayers = floor.spaceGraphics.map(s => {
-    return new Space(s.id, s.boundaries, {
-      selectable: true
-    });
+    return new Space(
+      s.id,
+      s.boundaries,
+      { pane: "spaces" },
+      { selectable: true }
+    );
   });
 
   spaceLayers.forEach(space => {
