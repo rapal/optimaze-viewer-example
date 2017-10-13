@@ -5,10 +5,9 @@ import {
   Space,
   Element,
   GraphicsLayer,
-  IDimensions,
-  IBoundary,
-  ICoordinate,
-  ITileCoordinates
+  Dimensions,
+  Boundary,
+  TileCoordinates
 } from "@rapal/optimaze-viewer";
 
 export default function loadViewer(
@@ -17,13 +16,7 @@ export default function loadViewer(
   floorId: string,
   accessToken: string
 ) {
-  const graphicsUrl = `${apiUrl}/${companyId}/floors/${floorId}/graphics`;
-  const seatsUrl = `${apiUrl}/${companyId}/seats?floorId=${floorId}`;
-
-  function getTileUrlTemplate(layer: GraphicsLayer) {
-    return `${apiUrl}/${companyId}/floors/${floorId}/tiles?layer=${layer}&x={x}&y={y}&z={z}`;
-  }
-
+  // Authenticated JSON request
   function getJson<TData>(url: string) {
     return fetch(url, {
       headers: {
@@ -32,33 +25,44 @@ export default function loadViewer(
     }).then<TData>(r => r.json());
   }
 
-  function getTile(layer: GraphicsLayer, coordinates: ITileCoordinates) {
+  function getFloorGraphics() {
+    const url = `${apiUrl}/${companyId}/floors/${floorId}/graphics`;
+    return getJson<FloorGraphics>(url);
+  }
+
+  function getSeats() {
+    const url = `${apiUrl}/${companyId}/seats?floorId=${floorId}`;
+    return getJson<List<Seat>>(url);
+  }
+
+  const tileCache: { [url: string]: string } = {};
+
+  function getTile(
+    layer: GraphicsLayer,
+    coordinates: TileCoordinates
+  ): Promise<string> {
     const url =
       `${apiUrl}/${companyId}/floors/${floorId}/tiles?` +
       `layer=${layer}&x=${coordinates.x}&y=${coordinates.y}&z=${coordinates.z}`;
-    return fetch(url, {
-      headers: {
-        authorization: "Bearer " + accessToken
-      }
-    }).then(r => r.json());
+
+    return getJson<string>(url).then(data => (tileCache[url] = data));
   }
 
-  Q.all([
-    getJson<IFloorGraphics>(graphicsUrl),
-    getJson<IList<ISeat>>(seatsUrl)
-  ]).then(values => {
+  Q.all([getFloorGraphics(), getSeats()]).then(values => {
     const floor = values[0];
     const seats = values[1].items;
 
     const viewer = new Viewer("viewer", floor.dimensions);
 
     // Add all available tile layers
-    // floor.graphicsLayers.forEach(l =>
-    //     viewer.addTileLayer(getTileUrlTemplate(l))
+    // floor.graphicsLayers.forEach(layer =>
+    //   viewer.addTileLayer(coordinates => getTile(layer, coordinates))
     // );
 
     // Or add specific tile layer
-    viewer.addTileLayer(coordinates => getTile(GraphicsLayer.Architect, coordinates));
+    viewer.addTileLayer(coordinates =>
+      getTile(GraphicsLayer.Architect, coordinates)
+    );
 
     // Creating custom panes is not neccessary, but makes sure
     // that elements of the same type are shown at the same z-index
@@ -133,23 +137,23 @@ export default function loadViewer(
     });
   });
 
-  interface IFloorGraphics {
-    dimensions: IDimensions;
+  interface FloorGraphics {
+    dimensions: Dimensions;
     graphicsLayers: GraphicsLayer[];
-    spaceGraphics: ISpaceGraphics[];
+    spaceGraphics: SpaceGraphics[];
     scale: number;
   }
 
-  interface ISpaceGraphics {
+  interface SpaceGraphics {
     id: string;
-    boundaries: IBoundary[];
+    boundaries: Boundary[];
   }
 
-  interface IList<TItem> {
+  interface List<TItem> {
     items: TItem[];
   }
 
-  interface ISeat {
+  interface Seat {
     id: number;
     x: number;
     y: number;

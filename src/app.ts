@@ -1,4 +1,5 @@
 import loadViewer from "./load-viewer";
+import { getAccessToken } from "./authentication";
 
 import "leaflet/dist/leaflet.css";
 import "./app.css";
@@ -16,7 +17,7 @@ const companyId = 1361;
 const appUrl = document.location.href.split("?")[0];
 const params = new URLSearchParams(document.location.search.substring(1));
 const floorId = params.get("floorId") || "m2033670";
-const code = params.get("code");
+const authorizationCode = params.get("code");
 
 // Login button
 const loginButton = document.getElementById("login");
@@ -30,33 +31,12 @@ loginButton.onclick = ev => {
     `&scope=${scope}&client_secret=${clientSecret}`;
 };
 
-function getAccessToken(authorizationCode: string) {
-  const tokenUrl = oauthUrl + "/token?";
-  const body =
-    "grant_type=authorization_code&code=" +
-    authorizationCode +
-    "&redirect_uri=" +
-    appUrl +
-    "&client_id=" +
-    clientId +
-    "&client_secret=" +
-    clientSecret;
-
-  return fetch(tokenUrl, {
-    method: "POST",
-    body
-  })
-    .then(response => {
-      if (response.ok) {
-        return response.json();
-      }
-      throw new Error("Cannot get access token.");
-    })
-    .then(json => json.access_token);
-}
-
-if (code) {
-  getAccessToken(code).then(token =>
-    loadViewer(apiUrl, companyId, floorId, token)
-  );
+if (authorizationCode) {
+  getAccessToken(
+    oauthUrl,
+    authorizationCode,
+    appUrl,
+    clientId,
+    clientSecret
+  ).then(token => loadViewer(apiUrl, companyId, floorId, token));
 }
