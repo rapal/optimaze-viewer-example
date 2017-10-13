@@ -7,11 +7,16 @@ import {
   GraphicsLayer,
   IDimensions,
   IBoundary,
-  ICoordinate
+  ICoordinate,
+  ITileCoordinates
 } from "@rapal/optimaze-viewer";
 
-export default function loadViewer(apiUrl: string, companyId: number, floorId: string, accessToken: string) {
-
+export default function loadViewer(
+  apiUrl: string,
+  companyId: number,
+  floorId: string,
+  accessToken: string
+) {
   const graphicsUrl = `${apiUrl}/${companyId}/floors/${floorId}/graphics`;
   const seatsUrl = `${apiUrl}/${companyId}/seats?floorId=${floorId}`;
 
@@ -25,6 +30,17 @@ export default function loadViewer(apiUrl: string, companyId: number, floorId: s
         authorization: "Bearer " + accessToken
       }
     }).then<TData>(r => r.json());
+  }
+
+  function getTile(layer: GraphicsLayer, coordinates: ITileCoordinates) {
+    const url =
+      `${apiUrl}/${companyId}/floors/${floorId}/tiles?` +
+      `layer=${layer}&x=${coordinates.x}&y=${coordinates.y}&z=${coordinates.z}`;
+    return fetch(url, {
+      headers: {
+        authorization: "Bearer " + accessToken
+      }
+    }).then(r => r.json());
   }
 
   Q.all([
@@ -42,7 +58,7 @@ export default function loadViewer(apiUrl: string, companyId: number, floorId: s
     // );
 
     // Or add specific tile layer
-    viewer.addTileLayer(getTileUrlTemplate(GraphicsLayer.Architect));
+    viewer.addTileLayer(coordinates => getTile(GraphicsLayer.Architect, coordinates));
 
     // Creating custom panes is not neccessary, but makes sure
     // that elements of the same type are shown at the same z-index
