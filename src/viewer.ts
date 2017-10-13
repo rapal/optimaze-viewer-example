@@ -54,15 +54,19 @@ export default function loadViewer(
 
     const viewer = new Viewer("viewer", floor.dimensions);
 
-    // Add all available tile layers
-    // floor.graphicsLayers.forEach(layer =>
-    //   viewer.addTileLayer(coordinates => getTile(layer, coordinates))
-    // );
+    // Add architect layer if available
+    if (floor.graphicsLayers.filter(l => l === GraphicsLayer.Architect)) {
+      viewer.addTileLayer(coordinates =>
+        getTile(GraphicsLayer.Architect, coordinates)
+      );
+    }
 
-    // Or add specific tile layer
-    viewer.addTileLayer(coordinates =>
-      getTile(GraphicsLayer.Architect, coordinates)
-    );
+    // Add furniture layer if available
+    if (floor.graphicsLayers.filter(l => l === GraphicsLayer.Furniture)) {
+      viewer.addTileLayer(coordinates =>
+        getTile(GraphicsLayer.Furniture, coordinates)
+      );
+    }
 
     // Creating custom panes is not neccessary, but makes sure
     // that elements of the same type are shown at the same z-index

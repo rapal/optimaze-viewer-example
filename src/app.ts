@@ -1,4 +1,4 @@
-import loadViewer from "./load-viewer";
+import loadViewer from "./viewer";
 import { getAccessToken } from "./authentication";
 
 import "leaflet/dist/leaflet.css";
@@ -12,11 +12,11 @@ const clientId = "optimaze-viewer-example";
 const scope = "Floorplan.Graphics.View";
 const clientSecret = "vc2Eml0oxTc9rS6wcJbl";
 const companyId = 1361;
+const floorId = "m2033670";
 
 // Get floor id from URL params or use default
 const appUrl = document.location.href.split("?")[0];
 const params = new URLSearchParams(document.location.search.substring(1));
-const floorId = params.get("floorId") || "m2033670";
 const authorizationCode = params.get("code");
 
 // Login button
@@ -32,6 +32,7 @@ loginButton.onclick = ev => {
 };
 
 if (authorizationCode) {
+  window.history.replaceState(null, "", window.location.pathname);
   getAccessToken(
     oauthUrl,
     authorizationCode,
