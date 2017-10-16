@@ -45,7 +45,7 @@ export default function loadViewer(
       `${apiUrl}/${companyId}/floors/${floorId}/tiles?` +
       `layer=${layer}&x=${coordinates.x}&y=${coordinates.y}&z=${coordinates.z}`;
 
-    return getJson<string>(url).then(data => (tileCache[url] = data));
+    return getJson<string>(url);
   }
 
   Q.all([getFloorGraphics(), getSeats()]).then(values => {

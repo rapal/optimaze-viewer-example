@@ -26,20 +26,19 @@ export function getAccessToken(
   authorizationCode: string | null
 ): Promise<string> {
   const redirectUrl = document.location.href.split("?")[0];
-  const accessToken = window.sessionStorage.getItem("access_token");
-  const accessTokenTime = window.sessionStorage.getItem("access_token_time");
-  const refreshToken = window.sessionStorage.getItem("refresh_token");
+  const accessToken = window.localStorage.getItem("access_token");
+  const accessTokenTime = window.localStorage.getItem("access_token_time");
+  const refreshToken = window.localStorage.getItem("refresh_token");
 
   if (
     accessToken &&
     accessTokenTime &&
-    isAfter(parseInt(accessTokenTime, 10), subMinutes(Date.now(), 15))
+    isAfter(parseInt(accessTokenTime, 10), subMinutes(Date.now(), 14))
   ) {
-    // Access token is available and less than 15 minutes old
+    // Access token is available and less than 14 minutes old
     return Promise.resolve(accessToken);
   } else if (refreshToken) {
     // Refresh token is available, get a new access token
-    // TODO: Check refresh token validity?
     return refreshAccessToken(refreshToken, redirectUrl);
   } else if (authorizationCode) {
     // Authorization code is available, get refresh and access tokens
@@ -84,9 +83,9 @@ async function getRefreshAndAccessTokens(
     }
   });
 
-  window.sessionStorage.setItem("refresh_token", json.refresh_token);
-  window.sessionStorage.setItem("access_token", json.access_token);
-  window.sessionStorage.setItem("access_token_time", Date.now().toString());
+  window.localStorage.setItem("refresh_token", json.refresh_token);
+  window.localStorage.setItem("access_token", json.access_token);
+  window.localStorage.setItem("access_token_time", Date.now().toString());
 
   return json.access_token;
 }
@@ -114,9 +113,9 @@ async function refreshAccessToken(refreshToken: string, redirectUrl: string) {
     }
   });
 
-  window.sessionStorage.setItem("refresh_token", json.refresh_token);
-  window.sessionStorage.setItem("access_token", json.access_token);
-  window.sessionStorage.setItem("access_token_time", Date.now().toString());
+  window.localStorage.setItem("refresh_token", json.refresh_token);
+  window.localStorage.setItem("access_token", json.access_token);
+  window.localStorage.setItem("access_token_time", Date.now().toString());
 
   return json.access_token;
 }
