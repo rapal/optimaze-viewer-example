@@ -7,7 +7,8 @@ import {
   GraphicsLayer,
   Dimensions,
   Boundary,
-  TileCoordinates
+  TileCoordinates,
+  FunctionalTileLayer
 } from "@rapal/optimaze-viewer";
 import { apiUrl } from "./config";
 
@@ -56,16 +57,20 @@ export default function loadViewer(
 
     // Add architect layer if available
     if (floor.graphicsLayers.filter(l => l === GraphicsLayer.Architect)) {
-      viewer.addTileLayer(coordinates =>
-        getTile(GraphicsLayer.Architect, coordinates)
+      const architectLayer = new FunctionalTileLayer(
+        coordinates => getTile(GraphicsLayer.Architect, coordinates),
+        viewer.dimensions
       );
+      viewer.addLayer(architectLayer);
     }
 
     // Add furniture layer if available
     if (floor.graphicsLayers.filter(l => l === GraphicsLayer.Furniture)) {
-      viewer.addTileLayer(coordinates =>
-        getTile(GraphicsLayer.Furniture, coordinates)
+      const furnitureLayer = new FunctionalTileLayer(
+        coordinates => getTile(GraphicsLayer.Furniture, coordinates),
+        viewer.dimensions
       );
+      viewer.addLayer(furnitureLayer);
     }
 
     // Creating custom panes is not neccessary, but makes sure

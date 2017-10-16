@@ -16,5 +16,5 @@ if (authorizationCode) {
 }
 
 getAccessToken(authorizationCode)
-  .then(token => loadViewer(companyId, floorId, token))
+  .then(accessToken => loadViewer(companyId, floorId, accessToken))
   .catch(() => showLoginButton());

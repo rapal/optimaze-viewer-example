@@ -1,7 +1,6 @@
 # optimaze-viewer-example
 
-This is an example application for the [`optimaze-viewer`](https://github.com/rapal/optimaze-viewer) library. 
-It is written in TypeScript and uses Webpack for bundling.
+This is an example application for the [`optimaze-viewer`](https://github.com/rapal/optimaze-viewer) library. It is written in TypeScript and uses Webpack for bundling. It implements OAuth 2 authorization code flow.
 
 Note: The API which this application uses is not yet published but will be published later in 2017.
 
