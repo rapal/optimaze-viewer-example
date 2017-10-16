@@ -51,12 +51,19 @@ export function getAccessToken(
   }
 }
 
+interface TokenResponse {
+  access_token: string;
+  expires_in: number;
+  refresh_token: string;
+  token_type: string;
+}
+
 /**
  * Gets a refresh token and access token using the authorization code.
  * Stores the refresh token, access token and it's update time in session storage.
  * Returns a promise that resolves with the access token.
  */
-function getRefreshAndAccessTokens(
+async function getRefreshAndAccessTokens(
   authorizationCode: string,
   redirectUrl: string
 ) {
@@ -68,34 +75,28 @@ function getRefreshAndAccessTokens(
   payload.set("client_id", clientId);
   payload.set("client_secret", clientSecret);
 
-  return fetch(tokenUrl, {
+  const json = await fetchJson<TokenResponse>(tokenUrl, {
     method: "POST",
     body: payload,
     headers: {
       // TODO: Default is "application/x-www-form-urlencoded;charset=UTF-8" which doesn't work
       "content-type": "x-www-form-urlencoded"
     }
-  })
-    .then(response => {
-      if (response.ok) {
-        return response.json();
-      }
-      throw new Error("Cannot get access token.");
-    })
-    .then(json => {
-      window.sessionStorage.setItem("refresh_token", json.refresh_token);
-      window.sessionStorage.setItem("access_token", json.access_token);
-      window.sessionStorage.setItem("access_token_time", Date.now().toString());
-      return json.access_token;
-    });
+  });
+
+  window.sessionStorage.setItem("refresh_token", json.refresh_token);
+  window.sessionStorage.setItem("access_token", json.access_token);
+  window.sessionStorage.setItem("access_token_time", Date.now().toString());
+
+  return json.access_token;
 }
 
 /**
  * Gets a new access token using the refresh token.
- * Stores the new access token and it's update time in session storage.
+ * Stores the refresh token, access token and it's update time in session storage.
  * Returns a promise that resolves with the access token.
  */
-function refreshAccessToken(refreshToken: string, redirectUrl: string) {
+async function refreshAccessToken(refreshToken: string, redirectUrl: string) {
   const tokenUrl = oauthUrl + "/token";
   const payload = new URLSearchParams();
   payload.set("grant_type", "refresh_token");
@@ -104,23 +105,35 @@ function refreshAccessToken(refreshToken: string, redirectUrl: string) {
   payload.set("client_id", clientId);
   payload.set("client_secret", clientSecret);
 
-  return fetch(tokenUrl, {
+  const json = await fetchJson<TokenResponse>(tokenUrl, {
     method: "POST",
     body: payload,
     headers: {
       // TODO: Default is "application/x-www-form-urlencoded;charset=UTF-8" which doesn't work
       "content-type": "x-www-form-urlencoded"
     }
-  })
-    .then(response => {
-      if (response.ok) {
-        return response.json();
-      }
-      throw new Error("Cannot refresh access token.");
-    })
-    .then(json => {
-      window.sessionStorage.setItem("access_token", json.access_token);
-      window.sessionStorage.setItem("access_token_time", Date.now().toString());
-      return json.access_token;
-    });
+  });
+
+  window.sessionStorage.setItem("refresh_token", json.refresh_token);
+  window.sessionStorage.setItem("access_token", json.access_token);
+  window.sessionStorage.setItem("access_token_time", Date.now().toString());
+
+  return json.access_token;
+}
+
+/**
+ * Fetches and returns parsed json.
+ * Throws error if repsonse is not ok.
+ */
+async function fetchJson<TData>(
+  input: RequestInfo,
+  init?: RequestInit | undefined
+) {
+  const response = await fetch(input, init);
+  if (response.ok) {
+    const json: TData = await response.json();
+    return json;
+  } else {
+    throw new Error(response.statusText);
+  }
 }
