@@ -1,4 +1,4 @@
-import { isAfter, subMinutes } from "date-fns";
+import { isAfter, subMinutes, addSeconds } from "date-fns";
 import { oauthUrl, clientId, clientSecret, scope } from "./config";
 
 export function showLoginButton() {
@@ -27,13 +27,13 @@ export function getAccessToken(
 ): Promise<string> {
   const redirectUrl = document.location.href.split("?")[0];
   const accessToken = window.localStorage.getItem("access_token");
-  const accessTokenTime = window.localStorage.getItem("access_token_time");
+  const accessTokenExpires = window.localStorage.getItem("access_token_expires");
   const refreshToken = window.localStorage.getItem("refresh_token");
 
   if (
     accessToken &&
-    accessTokenTime &&
-    isAfter(parseInt(accessTokenTime, 10), subMinutes(Date.now(), 14))
+    accessTokenExpires &&
+    isAfter(accessTokenExpires, Date.now())
   ) {
     // Access token is available and less than 14 minutes old
     return Promise.resolve(accessToken);
@@ -85,7 +85,10 @@ async function getRefreshAndAccessTokens(
 
   window.localStorage.setItem("refresh_token", json.refresh_token);
   window.localStorage.setItem("access_token", json.access_token);
-  window.localStorage.setItem("access_token_time", Date.now().toString());
+  window.localStorage.setItem(
+    "access_token_expires",
+    addSeconds(Date.now(), json.expires_in).toString()
+  );
 
   return json.access_token;
 }
@@ -115,7 +118,10 @@ async function refreshAccessToken(refreshToken: string, redirectUrl: string) {
 
   window.localStorage.setItem("refresh_token", json.refresh_token);
   window.localStorage.setItem("access_token", json.access_token);
-  window.localStorage.setItem("access_token_time", Date.now().toString());
+  window.localStorage.setItem(
+    "access_token_expires",
+    addSeconds(Date.now(), json.expires_in).toString()
+  );
 
   return json.access_token;
 }
