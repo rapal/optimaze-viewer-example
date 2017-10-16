@@ -61,20 +61,20 @@ function getRefreshAndAccessTokens(
   redirectUrl: string
 ) {
   const tokenUrl = oauthUrl + "/token";
-  const body =
-    "grant_type=authorization_code" +
-    "&code=" +
-    authorizationCode +
-    "&redirect_uri=" +
-    redirectUrl +
-    "&client_id=" +
-    clientId +
-    "&client_secret=" +
-    clientSecret;
+  const payload = new URLSearchParams();
+  payload.set("grant_type", "authorization_code");
+  payload.set("code", authorizationCode);
+  payload.set("redirect_uri", redirectUrl);
+  payload.set("client_id", clientId);
+  payload.set("client_secret", clientSecret);
 
   return fetch(tokenUrl, {
     method: "POST",
-    body
+    body: payload,
+    headers: {
+      // TODO: Default is "application/x-www-form-urlencoded;charset=UTF-8" which doesn't work
+      "content-type": "x-www-form-urlencoded"
+    }
   })
     .then(response => {
       if (response.ok) {
@@ -97,20 +97,20 @@ function getRefreshAndAccessTokens(
  */
 function refreshAccessToken(refreshToken: string, redirectUrl: string) {
   const tokenUrl = oauthUrl + "/token";
-  const body =
-    "grant_type=refresh_token" +
-    "&refresh_token=" +
-    refreshToken +
-    "&redirect_uri=" +
-    redirectUrl +
-    "&client_id=" +
-    clientId +
-    "&client_secret=" +
-    clientSecret;
+  const payload = new URLSearchParams();
+  payload.set("grant_type", "refresh_token");
+  payload.set("refresh_token", refreshToken);
+  payload.set("redirect_uri", redirectUrl);
+  payload.set("client_id", clientId);
+  payload.set("client_secret", clientSecret);
 
   return fetch(tokenUrl, {
     method: "POST",
-    body
+    body: payload,
+    headers: {
+      // TODO: Default is "application/x-www-form-urlencoded;charset=UTF-8" which doesn't work
+      "content-type": "x-www-form-urlencoded"
+    }
   })
     .then(response => {
       if (response.ok) {
