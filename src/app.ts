@@ -16,14 +16,21 @@ const floorId = "m2033670";
 
 // Get floor id from URL params or use default
 const appUrl = document.location.href.split("?")[0];
-const params = new URLSearchParams(document.location.search.substring(1));
+
+// Get authorization code from URL
+const params = new URLSearchParams(document.location.search);
 const authorizationCode = params.get("code");
+if (authorizationCode) {
+  window.sessionStorage.setItem("authorization_code", authorizationCode);
+  window.history.replaceState(null, "", window.location.pathname);
+}
 
 // Login button
 const loginButton = document.getElementById("login");
 if (!loginButton) {
   throw Error("No login button");
 }
+loginButton.setAttribute("hidden", "hidden");
 loginButton.onclick = ev => {
   document.location.href =
     `${oauthUrl}/authorize?response_type=code&client_id=${clientId}` +
@@ -31,13 +38,6 @@ loginButton.onclick = ev => {
     `&scope=${scope}&client_secret=${clientSecret}`;
 };
 
-if (authorizationCode) {
-  window.history.replaceState(null, "", window.location.pathname);
-  getAccessToken(
-    oauthUrl,
-    authorizationCode,
-    appUrl,
-    clientId,
-    clientSecret
-  ).then(token => loadViewer(apiUrl, companyId, floorId, token));
-}
+getAccessToken(oauthUrl, appUrl, clientId, clientSecret, authorizationCode)
+  .then(token => loadViewer(apiUrl, companyId, floorId, token))
+  .catch(() => loginButton.removeAttribute("hidden"));
