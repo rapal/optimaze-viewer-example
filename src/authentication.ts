@@ -1,60 +1,38 @@
-import { isAfter, subMinutes, addSeconds } from "date-fns";
+import { isFuture, addSeconds } from "date-fns";
 import { oauthUrl, clientId, clientSecret, scope } from "./config";
 
-export function showLoginButton() {
-  const redirectUrl = document.location.href.split("?")[0];
-  const loginButton = document.getElementById("login");
-  if (!loginButton) {
-    throw Error("No element with id #login found.");
-  }
-  loginButton.removeAttribute("hidden");
-  loginButton.onclick = ev => {
-    document.location.href =
-      `${oauthUrl}/authorize?response_type=code` +
-      `&client_id=${clientId}` +
-      `&redirect_uri=${redirectUrl}` +
-      `&scope=${scope}` +
-      `&client_secret=${clientSecret}`;
-  };
-}
-
 /**
- * Gets access token from session storage or by requesting new token.
- * Rejects if no valid token can be requested.
+ * Gets access token from local storage or by requesting new token.
+ * Throws error if no valid token can be returned.
  */
-export function getAccessToken(
+export async function getAccessToken(
   authorizationCode: string | null
 ): Promise<string> {
   const redirectUrl = document.location.href.split("?")[0];
   const accessToken = window.localStorage.getItem("access_token");
-  const accessTokenExpires = window.localStorage.getItem("access_token_expires");
+  const accessTokenExpires = window.localStorage.getItem(
+    "access_token_expires"
+  );
   const refreshToken = window.localStorage.getItem("refresh_token");
 
-  if (
-    accessToken &&
-    accessTokenExpires &&
-    isAfter(accessTokenExpires, Date.now())
-  ) {
-    // Access token is available and less than 14 minutes old
-    return Promise.resolve(accessToken);
-  } else if (refreshToken) {
-    // Refresh token is available, get a new access token
-    return refreshAccessToken(refreshToken, redirectUrl);
-  } else if (authorizationCode) {
-    // Authorization code is available, get refresh and access tokens
-    return getRefreshAndAccessTokens(authorizationCode, redirectUrl);
-  } else {
-    return Promise.reject(
-      "Cannot get access code. Make sure 'authorization_code' is saved to session storage."
-    );
+  // 1. Access token is available and not expired
+  if (accessToken && accessTokenExpires && isFuture(accessTokenExpires)) {
+    return accessToken;
   }
-}
 
-interface TokenResponse {
-  access_token: string;
-  expires_in: number;
-  refresh_token: string;
-  token_type: string;
+  // 2. Refresh token is available, get new access token
+  if (refreshToken) {
+    return await refreshAccessToken(refreshToken, redirectUrl);
+  }
+
+  // 3. Authorization code is available, get refresh and access tokens
+  if (authorizationCode) {
+    return await getRefreshAndAccessTokens(authorizationCode, redirectUrl);
+  }
+
+  throw new Error(
+    "Cannot get access code. Make sure 'authorization_code' is saved to session storage."
+  );
 }
 
 /**
@@ -141,4 +119,31 @@ async function fetchJson<TData>(
   } else {
     throw new Error(response.statusText);
   }
+}
+
+interface TokenResponse {
+  access_token: string;
+  expires_in: number;
+  refresh_token: string;
+  token_type: string;
+}
+
+/**
+ * Shows login button which takes the user to the authorize page.
+ */
+export function showLoginButton() {
+  const redirectUrl = document.location.href.split("?")[0];
+  const loginButton = document.getElementById("login");
+  if (!loginButton) {
+    throw Error("No element with id #login found.");
+  }
+  loginButton.removeAttribute("hidden");
+  loginButton.onclick = ev => {
+    document.location.href =
+      `${oauthUrl}/authorize?response_type=code` +
+      `&client_id=${clientId}` +
+      `&redirect_uri=${redirectUrl}` +
+      `&scope=${scope}` +
+      `&client_secret=${clientSecret}`;
+  };
 }
