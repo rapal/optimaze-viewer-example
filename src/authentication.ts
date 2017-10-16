@@ -1,12 +1,8 @@
 import { isAfter, subMinutes } from "date-fns";
+import { oauthUrl, clientId, clientSecret, scope } from "./config";
 
-export function showLoginButton(
-  oauthUrl: string,
-  redirectUrl: string,
-  clientId: string,
-  clientSecret: string,
-  scope: string
-) {
+export function showLoginButton() {
+  const redirectUrl = document.location.href.split("?")[0];
   const loginButton = document.getElementById("login");
   if (!loginButton) {
     throw Error("No element with id #login found.");
@@ -27,12 +23,9 @@ export function showLoginButton(
  * Rejects if no valid token can be requested.
  */
 export function getAccessToken(
-  oauthUrl: string,
-  redirectUrl: string,
-  clientId: string,
-  clientSecret: string,
   authorizationCode: string | null
 ): Promise<string> {
+  const redirectUrl = document.location.href.split("?")[0];
   const accessToken = window.sessionStorage.getItem("access_token");
   const accessTokenTime = window.sessionStorage.getItem("access_token_time");
   const refreshToken = window.sessionStorage.getItem("refresh_token");
@@ -47,22 +40,10 @@ export function getAccessToken(
   } else if (refreshToken) {
     // Refresh token is available, get a new access token
     // TODO: Check refresh token validity?
-    return refreshAccessToken(
-      oauthUrl,
-      refreshToken,
-      redirectUrl,
-      clientId,
-      clientSecret
-    );
+    return refreshAccessToken(refreshToken, redirectUrl);
   } else if (authorizationCode) {
     // Authorization code is available, get refresh and access tokens
-    return getRefreshAndAccessTokens(
-      oauthUrl,
-      authorizationCode,
-      redirectUrl,
-      clientId,
-      clientSecret
-    );
+    return getRefreshAndAccessTokens(authorizationCode, redirectUrl);
   } else {
     return Promise.reject(
       "Cannot get access code. Make sure 'authorization_code' is saved to session storage."
@@ -76,11 +57,8 @@ export function getAccessToken(
  * Returns a promise that resolves with the access token.
  */
 function getRefreshAndAccessTokens(
-  oauthUrl: string,
   authorizationCode: string,
-  redirectUrl: string,
-  clientId: string,
-  clientSecret: string
+  redirectUrl: string
 ) {
   const tokenUrl = oauthUrl + "/token";
   const body =
@@ -117,13 +95,7 @@ function getRefreshAndAccessTokens(
  * Stores the new access token and it's update time in session storage.
  * Returns a promise that resolves with the access token.
  */
-function refreshAccessToken(
-  oauthUrl: string,
-  refreshToken: string,
-  redirectUrl: string,
-  clientId: string,
-  clientSecret: string
-) {
+function refreshAccessToken(refreshToken: string, redirectUrl: string) {
   const tokenUrl = oauthUrl + "/token";
   const body =
     "grant_type=refresh_token" +

@@ -9,9 +9,9 @@ import {
   Boundary,
   TileCoordinates
 } from "@rapal/optimaze-viewer";
+import { apiUrl } from "./config";
 
 export default function loadViewer(
-  apiUrl: string,
   companyId: number,
   floorId: string,
   accessToken: string
