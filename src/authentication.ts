@@ -1,5 +1,31 @@
 import { isAfter, subMinutes } from "date-fns";
 
+export function showLoginButton(
+  oauthUrl: string,
+  redirectUrl: string,
+  clientId: string,
+  clientSecret: string,
+  scope: string
+) {
+  const loginButton = document.getElementById("login");
+  if (!loginButton) {
+    throw Error("No element with id #login found.");
+  }
+  loginButton.removeAttribute("hidden");
+  loginButton.onclick = ev => {
+    document.location.href =
+      `${oauthUrl}/authorize?response_type=code` +
+      `&client_id=${clientId}` +
+      `&redirect_uri=${redirectUrl}` +
+      `&scope=${scope}` +
+      `&client_secret=${clientSecret}`;
+  };
+}
+
+/**
+ * Gets access token from session storage or by requesting new token.
+ * Rejects if no valid token can be requested.
+ */
 export function getAccessToken(
   oauthUrl: string,
   redirectUrl: string,

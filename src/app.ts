@@ -1,5 +1,5 @@
 import loadViewer from "./viewer";
-import { getAccessToken } from "./authentication";
+import { getAccessToken, showLoginButton } from "./authentication";
 
 import "leaflet/dist/leaflet.css";
 import "./app.css";
@@ -25,19 +25,8 @@ if (authorizationCode) {
   window.history.replaceState(null, "", window.location.pathname);
 }
 
-// Login button
-const loginButton = document.getElementById("login");
-if (!loginButton) {
-  throw Error("No login button");
-}
-loginButton.setAttribute("hidden", "hidden");
-loginButton.onclick = ev => {
-  document.location.href =
-    `${oauthUrl}/authorize?response_type=code&client_id=${clientId}` +
-    `&redirect_uri=${appUrl}` +
-    `&scope=${scope}&client_secret=${clientSecret}`;
-};
-
 getAccessToken(oauthUrl, appUrl, clientId, clientSecret, authorizationCode)
   .then(token => loadViewer(apiUrl, companyId, floorId, token))
-  .catch(() => loginButton.removeAttribute("hidden"));
+  .catch(() =>
+    showLoginButton(oauthUrl, appUrl, clientId, clientSecret, scope)
+  );
