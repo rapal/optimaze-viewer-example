@@ -106,7 +106,7 @@ async function refreshAccessToken(refreshToken: string, redirectUrl: string) {
 
 /**
  * Fetches and returns parsed json.
- * Throws error if repsonse is not ok.
+ * Throws error if response is not ok.
  */
 async function fetchJson<TData>(
   input: RequestInfo,
