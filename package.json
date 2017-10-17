@@ -10,7 +10,7 @@
   },
   "scripts": {
     "build": "yarn run lint && rimraf build && webpack",
-    "start": "webpack-dev-server",
+    "watch": "yarn run lint && rimraf build && webpack -w",
     "lint": "tslint --config tslint.json --project tsconfig.json"
   },
   "devDependencies": {

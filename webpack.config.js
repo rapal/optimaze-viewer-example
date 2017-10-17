@@ -8,6 +8,10 @@ module.exports = {
     path: path.resolve("build"),
     filename: "bundle.js"
   },
+  stats: {
+    chunks: false,
+    children: false
+  },
   plugins: [
     new ExtractTextPlugin({
       filename: "bundle.css"
