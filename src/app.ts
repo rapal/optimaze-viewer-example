@@ -1,5 +1,5 @@
 import loadViewer from "./viewer";
-import { getAccessToken, showLoginButton } from "./authentication";
+import { getAccessToken, showLoginButton, showUserInfo } from "./authentication";
 
 import "leaflet/dist/leaflet.css";
 import "./app.css";
@@ -16,5 +16,8 @@ if (authorizationCode) {
 }
 
 getAccessToken(authorizationCode)
-  .then(accessToken => loadViewer(companyId, floorId, accessToken))
+  .then(accessToken => {
+    loadViewer(companyId, floorId, accessToken);
+    showUserInfo(accessToken);
+  })
   .catch(() => showLoginButton());

@@ -1,4 +1,5 @@
 import { isFuture, addSeconds } from "date-fns";
+import * as jwtDecode from "jwt-decode";
 import { oauthUrl, clientId, clientSecret, scope } from "./config";
 
 /**
@@ -129,21 +130,63 @@ interface TokenResponse {
 }
 
 /**
+ * Redirects the user to the Portal authorize page,
+ * or to the login page if the user is not logged in.
+ */
+function login() {
+  const redirectUrl = document.location.href.split("?")[0];
+
+  const params = new URLSearchParams();
+  params.set("response_type", "code");
+  params.set("client_id", clientId);
+  params.set("redirect_uri", redirectUrl);
+  params.set("scope", scope);
+  params.set("client_secret", clientSecret);
+
+  document.location.href = `${oauthUrl}/authorize?${params}`;
+}
+
+/**
+ * Logs out the user by clearing all tokens from local storage and reloading the page.
+ */
+function logout() {
+  window.localStorage.removeItem("refresh_token");
+  window.localStorage.removeItem("access_token");
+  window.localStorage.removeItem("access_token_expires");
+  window.location.reload();
+}
+
+/**
  * Shows login button which takes the user to the authorize page.
  */
 export function showLoginButton() {
-  const redirectUrl = document.location.href.split("?")[0];
-  const loginButton = document.getElementById("login");
-  if (!loginButton) {
-    throw Error("No element with id #login found.");
-  }
-  loginButton.removeAttribute("hidden");
-  loginButton.onclick = ev => {
-    document.location.href =
-      `${oauthUrl}/authorize?response_type=code` +
-      `&client_id=${clientId}` +
-      `&redirect_uri=${redirectUrl}` +
-      `&scope=${scope}` +
-      `&client_secret=${clientSecret}`;
-  };
+  const loginButton = document.createElement("button");
+  loginButton.innerText = "Log in";
+  loginButton.setAttribute("class", "login-button");
+  loginButton.onclick = ev => login();
+
+  document.body.appendChild(loginButton);
+}
+
+/**
+ * Adds an element to the body that shows the currently logged in user and a logout link.
+ */
+export function showUserInfo(accessToken: string) {
+  const jwt: User = jwtDecode(accessToken);
+
+  const userInfo = document.createElement("div");
+  userInfo.innerText = jwt.unique_name;
+  userInfo.setAttribute("class", "user-info");
+
+  const logoutButton = document.createElement("button");
+  logoutButton.innerText = "Log out";
+  logoutButton.setAttribute("class", "logout-button");
+  logoutButton.onclick = () => logout();
+  userInfo.appendChild(logoutButton);
+
+  document.body.appendChild(userInfo);
+}
+
+interface User {
+  unique_name: string;
 }
