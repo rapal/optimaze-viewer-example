@@ -9,8 +9,8 @@
     "url": "https://github.com/rapal/optimaze-viewer-example"
   },
   "scripts": {
-    "build": "yarn run lint && rimraf build && webpack",
-    "watch": "yarn run lint && rimraf build && webpack -w",
+    "start": "yarn run lint && rimraf build && webpack -w",
+    "build": "yarn run lint && rimraf build && webpack -p --env production",
     "lint": "tslint --config tslint.json --project tsconfig.json"
   },
   "devDependencies": {
