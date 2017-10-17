@@ -53,13 +53,9 @@ async function getRefreshAndAccessTokens(
   payload.set("client_id", clientId);
   payload.set("client_secret", clientSecret);
 
-  const json = await fetchJson<TokenResponse>(tokenUrl, {
+  const json = await fetchJson<AuthorizationCodeResponse>(tokenUrl, {
     method: "POST",
-    body: payload,
-    headers: {
-      // TODO: Default is "application/x-www-form-urlencoded;charset=UTF-8" which doesn't work
-      "content-type": "x-www-form-urlencoded"
-    }
+    body: payload
   });
 
   window.localStorage.setItem("refresh_token", json.refresh_token);
@@ -86,16 +82,11 @@ async function refreshAccessToken(refreshToken: string, redirectUrl: string) {
   payload.set("client_id", clientId);
   payload.set("client_secret", clientSecret);
 
-  const json = await fetchJson<TokenResponse>(tokenUrl, {
+  const json = await fetchJson<RefreshTokenResponse>(tokenUrl, {
     method: "POST",
-    body: payload,
-    headers: {
-      // TODO: Default is "application/x-www-form-urlencoded;charset=UTF-8" which doesn't work
-      "content-type": "x-www-form-urlencoded"
-    }
+    body: payload
   });
 
-  window.localStorage.setItem("refresh_token", json.refresh_token);
   window.localStorage.setItem("access_token", json.access_token);
   window.localStorage.setItem(
     "access_token_expires",
@@ -122,10 +113,16 @@ async function fetchJson<TData>(
   }
 }
 
-interface TokenResponse {
+interface AuthorizationCodeResponse {
   access_token: string;
   expires_in: number;
   refresh_token: string;
+  token_type: string;
+}
+
+interface RefreshTokenResponse {
+  access_token: string;
+  expires_in: number;
   token_type: string;
 }
 
