@@ -2,9 +2,9 @@
 # yarn lockfile v1
 
 
-"@rapal/optimaze-viewer@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@rapal/optimaze-viewer/-/optimaze-viewer-0.2.0.tgz#e3de4d7f86b46fe04d75a49b63d109e11d3de86b"
+"@rapal/optimaze-viewer@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@rapal/optimaze-viewer/-/optimaze-viewer-0.3.0.tgz#a6eef1eb54551ffd654060fc98f0843601e83bbd"
   dependencies:
     "@types/leaflet" "^1.2.0"
     leaflet "^1.2.0"
