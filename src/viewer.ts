@@ -71,13 +71,13 @@ export default function loadViewer(
     }
 
     // Add furniture layer if available
-    // if (floor.graphicsLayers.filter(l => l === GraphicsLayer.Furniture)) {
-    //   const furnitureLayer = new FunctionalTileLayer(
-    //     coordinates => getTile(GraphicsLayer.Furniture, coordinates),
-    //     viewer.dimensions
-    //   );
-    //   viewer.addLayer(furnitureLayer);
-    // }
+    if (floor.graphicsLayers.filter(l => l === GraphicsLayer.Furniture)) {
+      const furnitureLayer = new FunctionalTileLayer(
+        coordinates => getTile(GraphicsLayer.Furniture, coordinates),
+        viewer.dimensions
+      );
+      viewer.addLayer(furnitureLayer);
+    }
 
     // Creating custom panes is not neccessary, but makes sure
     // that elements of the same type are shown at the same z-index
