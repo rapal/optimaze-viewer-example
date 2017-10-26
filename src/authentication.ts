@@ -2,6 +2,10 @@ import { isFuture, addSeconds } from "date-fns";
 import * as jwtDecode from "jwt-decode";
 import { oauthUrl, clientId, clientSecret, scope } from "./config";
 
+// http://localhost:8080/ is always allowed
+// Other redirect URIs must be configured for the client
+const redirectUri = document.location.href.split("?")[0];
+
 /**
  * Gets access token from local storage or by requesting new token.
  * Throws error if no valid token can be returned.
@@ -9,7 +13,6 @@ import { oauthUrl, clientId, clientSecret, scope } from "./config";
 export async function getAccessToken(
   authorizationCode: string | null
 ): Promise<string> {
-  const redirectUrl = document.location.href.split("?")[0];
   const accessToken = window.localStorage.getItem("access_token");
   const accessTokenExpires = window.localStorage.getItem(
     "access_token_expires"
@@ -23,12 +26,12 @@ export async function getAccessToken(
 
   // 2. Refresh token is available, get new access token
   if (refreshToken) {
-    return await refreshAccessToken(refreshToken, redirectUrl);
+    return await refreshAccessToken(refreshToken);
   }
 
   // 3. Authorization code is available, get refresh and access tokens
   if (authorizationCode) {
-    return await getRefreshAndAccessTokens(authorizationCode, redirectUrl);
+    return await getRefreshAndAccessTokens(authorizationCode);
   }
 
   throw new Error(
@@ -41,15 +44,12 @@ export async function getAccessToken(
  * Stores the refresh token, access token and it's update time in session storage.
  * Returns a promise that resolves with the access token.
  */
-async function getRefreshAndAccessTokens(
-  authorizationCode: string,
-  redirectUrl: string
-) {
+async function getRefreshAndAccessTokens(authorizationCode: string) {
   const tokenUrl = oauthUrl + "/token";
   const payload = new URLSearchParams();
   payload.set("grant_type", "authorization_code");
   payload.set("code", authorizationCode);
-  payload.set("redirect_uri", redirectUrl);
+  payload.set("redirect_uri", redirectUri);
   payload.set("client_id", clientId);
   payload.set("client_secret", clientSecret);
 
@@ -73,12 +73,12 @@ async function getRefreshAndAccessTokens(
  * Stores the refresh token, access token and it's update time in session storage.
  * Returns a promise that resolves with the access token.
  */
-async function refreshAccessToken(refreshToken: string, redirectUrl: string) {
+async function refreshAccessToken(refreshToken: string) {
   const tokenUrl = oauthUrl + "/token";
   const payload = new URLSearchParams();
   payload.set("grant_type", "refresh_token");
   payload.set("refresh_token", refreshToken);
-  payload.set("redirect_uri", redirectUrl);
+  payload.set("redirect_uri", redirectUri);
   payload.set("client_id", clientId);
   payload.set("client_secret", clientSecret);
 

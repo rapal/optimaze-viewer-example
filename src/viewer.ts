@@ -23,7 +23,13 @@ export default function loadViewer(
       headers: {
         authorization: "Bearer " + accessToken
       }
-    }).then<TData>(r => r.json());
+    }).then<TData>(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error(response.statusText);
+      }
+    });
   }
 
   function getFloorGraphics() {
