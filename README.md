@@ -7,6 +7,6 @@ Note: The API which this application uses is not yet published but will be publi
 ## Usage
 
 1. Run `yarn` to install dependencies
-2. Run `yarn start` to run webpack in watch mode
-    * Or run `yarn build` to create a production build
-3. Open `index.html`
+2. Run `yarn start` to start dev server
+
+Alternatively, run `yarn build` to create a production build
