@@ -5,6 +5,7 @@ body {
 
 #viewer {
   height: 100vh;
+  z-index: 0;
 }
 
 .leaflet-container {
@@ -16,8 +17,8 @@ body {
   top: 50%;
   left: 50%;
   font-size: 24px;
-  width: 100px;
-  margin-left: -50px;
+  width: 140px;
+  margin-left: -70px;
 }
 
 .user-info {
@@ -25,8 +26,10 @@ body {
   top: 10px;
   right: 10px;
   background: #eee;
+  border: 1px solid #ddd;
   border-radius: 3px;
   padding: 10px;
+  z-index: 1;
 }
 
 .logout-button {
