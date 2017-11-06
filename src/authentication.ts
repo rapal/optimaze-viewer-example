@@ -7,12 +7,11 @@ import { oauthUrl, clientId, clientSecret, scope } from "./config";
 const redirectUri = document.location.href.split("?")[0];
 
 /**
- * Gets access token from local storage or by requesting new token.
- * Throws error if no valid token can be returned.
+ * Gets access token from local storage, by requesting new token,
+ * or by reading authorization code from URL parameter.
+ * Throws exception if no valid token can be returned.
  */
-export async function getAccessToken(
-  authorizationCode: string | null
-): Promise<string> {
+export async function getAccessToken(): Promise<string> {
   const accessToken = window.localStorage.getItem("access_token");
   const accessTokenExpires = window.localStorage.getItem(
     "access_token_expires"
@@ -30,13 +29,25 @@ export async function getAccessToken(
   }
 
   // 3. Authorization code is available, get refresh and access tokens
+  const authorizationCode = getAuthorizationCode();
   if (authorizationCode) {
     return await getRefreshAndAccessTokens(authorizationCode);
   }
 
-  throw new Error(
-    "Cannot get access code. Make sure 'authorization_code' is saved to session storage."
-  );
+  // 4. Cannot get access token, user needs to log in
+  throw new Error("Cannot get access token. User needs to log in.");
+}
+
+/**
+ * Gets the authorization code from the `code` URL parameter and removes it from the URL.
+ */
+function getAuthorizationCode() {
+  const params = new URLSearchParams(document.location.search);
+  const authorizationCode = params.get("code");
+  if (authorizationCode) {
+    window.history.replaceState(null, "", window.location.pathname);
+  }
+  return authorizationCode;
 }
 
 /**
@@ -168,7 +179,9 @@ export function showLoginButton() {
 /**
  * Adds an element to the body that shows the currently logged in user and a logout link.
  */
-export function showUserInfo(accessToken: string) {
+export async function showUserInfo() {
+  const accessToken = await getAccessToken();
+
   const jwt: User = jwtDecode(accessToken);
 
   const userInfo = document.createElement("div");
