@@ -1,32 +1,11 @@
 import { apiUrl } from "./config";
-import { getAccessToken, showLoginButton } from "./authentication";
+import { getAccessToken, showLoginButton, logout } from "./authentication";
 import {
-  Viewer,
-  Space,
-  Element,
   GraphicsLayer,
   Dimensions,
   Boundary,
-  TileCoordinates,
-  FunctionalTileLayer
+  TileCoordinates
 } from "@rapal/optimaze-viewer";
-
-/**
- * Authenticated JSON request
- */
-async function getJson<TData>(url: string): Promise<TData> {
-  const accessToken = await getAccessToken();
-
-  const response = await fetch(url, {
-    headers: [["Authorization", "Bearer " + accessToken]]
-  });
-
-  if (response.ok) {
-    return response.json();
-  } else {
-    throw new Error(response.statusText);
-  }
-}
 
 export async function getFloorGraphics(companyId: number, floorId: string) {
   const url = `${apiUrl}/${companyId}/floors/${floorId}/graphics`;
@@ -48,6 +27,28 @@ export async function getTile(
     `${apiUrl}/${companyId}/floors/${floorId}/tiles?` +
     `layer=${layer}&x=${coordinates.x}&y=${coordinates.y}&z=${coordinates.z}`;
   return getJson<string>(url);
+}
+
+/**
+ * Authenticated JSON request
+ */
+async function getJson<TData>(url: string): Promise<TData> {
+  try {
+    const accessToken = await getAccessToken();
+
+    const response = await fetch(url, {
+      headers: [["Authorization", "Bearer " + accessToken]]
+    });
+
+    if (response.ok) {
+      return response.json();
+    } else {
+      throw new Error(response.statusText);
+    }
+  } catch (e) {
+    logout();
+    throw e;
+  }
 }
 
 interface FloorGraphics {

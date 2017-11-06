@@ -9,7 +9,7 @@ const redirectUri = document.location.href.split("?")[0];
 /**
  * Gets access token from local storage, by requesting new token,
  * or by reading authorization code from URL parameter.
- * Throws exception if no valid token can be returned.
+ * Returns null if no valid token can be returned.
  */
 export async function getAccessToken(): Promise<string> {
   const accessToken = window.localStorage.getItem("access_token");
@@ -157,7 +157,7 @@ function login() {
 /**
  * Logs out the user by clearing all tokens from local storage and reloading the page.
  */
-function logout() {
+export function logout() {
   window.localStorage.removeItem("refresh_token");
   window.localStorage.removeItem("access_token");
   window.localStorage.removeItem("access_token_expires");
