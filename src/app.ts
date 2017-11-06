@@ -1,9 +1,5 @@
 import { loadViewer } from "./viewer";
-import {
-  getAccessToken,
-  showUserInfo,
-  showLogin
-} from "./authentication";
+import { getAccessToken, showUserInfo, showLogin } from "./authentication";
 
 import "leaflet/dist/leaflet.css";
 import "./app.css";
