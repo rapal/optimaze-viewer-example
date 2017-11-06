@@ -158,22 +158,28 @@ function login() {
  * Logs out the user by clearing all tokens from local storage and reloading the page.
  */
 export function logout() {
-  window.localStorage.removeItem("refresh_token");
-  window.localStorage.removeItem("access_token");
-  window.localStorage.removeItem("access_token_expires");
+  clearTokens();
   window.location.reload();
 }
 
 /**
  * Shows login button which takes the user to the authorize page.
  */
-export function showLoginButton() {
+export function showLogin() {
+  clearTokens();
+
   const loginButton = document.createElement("button");
   loginButton.innerText = "Log in";
   loginButton.setAttribute("class", "login-button");
   loginButton.onclick = ev => login();
 
   document.body.appendChild(loginButton);
+}
+
+function clearTokens() {
+  window.localStorage.removeItem("refresh_token");
+  window.localStorage.removeItem("access_token");
+  window.localStorage.removeItem("access_token_expires");
 }
 
 /**

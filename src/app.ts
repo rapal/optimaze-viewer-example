@@ -2,7 +2,7 @@ import { loadViewer } from "./viewer";
 import {
   getAccessToken,
   showUserInfo,
-  showLoginButton
+  showLogin
 } from "./authentication";
 
 import "leaflet/dist/leaflet.css";
@@ -20,6 +20,6 @@ getAccessToken().then(
   },
   () => {
     // Access token unavailable, user must log in
-    showLoginButton();
+    showLogin();
   }
 );

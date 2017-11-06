@@ -1,5 +1,5 @@
 import { apiUrl } from "./config";
-import { getAccessToken, showLoginButton, logout } from "./authentication";
+import { getAccessToken, logout } from "./authentication";
 import {
   GraphicsLayer,
   Dimensions,
@@ -30,7 +30,7 @@ export async function getTile(
 }
 
 /**
- * Authenticated JSON request
+ * Authenticated JSON request.
  */
 async function getJson<TData>(url: string): Promise<TData> {
   try {
