@@ -20,9 +20,9 @@ export default function loadViewer(
   // Authenticated JSON request
   function getJson<TData>(url: string) {
     return fetch(url, {
-      headers: {
-        authorization: "Bearer " + accessToken
-      }
+      headers: [
+        ["Authorization", "Bearer " + accessToken]
+      ]
     }).then<TData>(response => {
       if (response.ok) {
         return response.json();

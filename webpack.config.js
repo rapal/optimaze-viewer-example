@@ -2,14 +2,6 @@ var path = require("path");
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 var HtmlWebpackPlugin = require("html-webpack-plugin");
 
-var stats = {
-  chunks: false,
-  children: false,
-  modules: false,
-  hash: false,
-  version: false
-};
-
 module.exports = function(env) {
   var production = env === "production";
 
@@ -20,10 +12,10 @@ module.exports = function(env) {
       filename: "bundle.js"
     },
     devtool: production ? "source-map" : "inline-source-map",
-    stats: stats,
+    stats: "minimal",
     devServer: {
       contentBase: false,
-      stats: stats
+      stats: "minimal"
     },
     plugins: [
       new ExtractTextPlugin({
