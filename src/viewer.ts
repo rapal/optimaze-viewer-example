@@ -5,172 +5,104 @@ import {
   Space,
   Element,
   GraphicsLayer,
-  Dimensions,
-  Boundary,
-  TileCoordinates,
   FunctionalTileLayer
 } from "@rapal/optimaze-viewer";
-import { apiUrl } from "./config";
+import { getFloorGraphics, getSeats, getTile } from "./data";
 
-export default function loadViewer(
-  companyId: number,
-  floorId: string,
-  accessToken: string
-) {
-  // Authenticated JSON request
-  function getJson<TData>(url: string) {
-    return fetch(url, {
-      headers: {
-        authorization: "Bearer " + accessToken
-      }
-    }).then<TData>(response => {
-      if (response.ok) {
-        return response.json();
-      } else {
-        throw new Error(response.statusText);
-      }
-    });
-  }
+export async function loadViewer(companyId: number, floorId: string) {
+  const values = await Q.all([
+    getFloorGraphics(companyId, floorId),
+    getSeats(companyId, floorId)
+  ]);
 
-  function getFloorGraphics() {
-    const url = `${apiUrl}/${companyId}/floors/${floorId}/graphics`;
-    return getJson<FloorGraphics>(url);
-  }
+  const floor = values[0];
+  const seats = values[1].items;
 
-  function getSeats() {
-    const url = `${apiUrl}/${companyId}/seats?floorId=${floorId}`;
-    return getJson<List<Seat>>(url);
-  }
+  const viewer = new Viewer("viewer", floor.dimensions);
 
-  const tileCache: { [url: string]: string } = {};
-
-  function getTile(
-    layer: GraphicsLayer,
-    coordinates: TileCoordinates
-  ): Promise<string> {
-    const url =
-      `${apiUrl}/${companyId}/floors/${floorId}/tiles?` +
-      `layer=${layer}&x=${coordinates.x}&y=${coordinates.y}&z=${coordinates.z}`;
-
-    return getJson<string>(url);
-  }
-
-  Q.all([getFloorGraphics(), getSeats()]).then(values => {
-    const floor = values[0];
-    const seats = values[1].items;
-
-    const viewer = new Viewer("viewer", floor.dimensions);
-
-    // Add architect layer if available
-    if (floor.graphicsLayers.filter(l => l === GraphicsLayer.Architect)) {
+  function addLayer(layer: GraphicsLayer) {
+    if (floor.graphicsLayers.filter(l => l === layer)) {
       const architectLayer = new FunctionalTileLayer(
-        coordinates => getTile(GraphicsLayer.Architect, coordinates),
+        coordinates => getTile(companyId, floorId, layer, coordinates),
         viewer.dimensions
       );
       viewer.addLayer(architectLayer);
     }
+  }
 
-    // Add furniture layer if available
-    if (floor.graphicsLayers.filter(l => l === GraphicsLayer.Furniture)) {
-      const furnitureLayer = new FunctionalTileLayer(
-        coordinates => getTile(GraphicsLayer.Furniture, coordinates),
-        viewer.dimensions
-      );
-      viewer.addLayer(furnitureLayer);
-    }
+  // Add architect and furniture layers if available
+  addLayer(GraphicsLayer.Architect);
+  addLayer(GraphicsLayer.Furniture);
 
-    // Creating custom panes is not neccessary, but makes sure
-    // that elements of the same type are shown at the same z-index
-    viewer.createPane("spaces").style.zIndex = "405";
-    viewer.createPane("seats").style.zIndex = "410";
+  // Creating custom panes is not neccessary, but makes sure
+  // that elements of the same type are shown at the same z-index
+  viewer.createPane("spaces").style.zIndex = "405";
+  viewer.createPane("seats").style.zIndex = "410";
 
-    // Create selectable space layers
-    const spaceLayers = floor.spaceGraphics.map(s => {
-      return new Space(
-        s.id,
-        s.boundaries,
-        { pane: "spaces" },
-        { selectable: true }
-      );
+  // Create selectable space layers
+  const spaceLayers = floor.spaceGraphics.map(s => {
+    return new Space(
+      s.id,
+      s.boundaries,
+      { pane: "spaces" },
+      { selectable: true }
+    );
+  });
+
+  spaceLayers.forEach(space => {
+    // Add to map
+    viewer.addLayer(space);
+
+    // Deselect other spaces and log space id when selected
+    space.on("select", e => {
+      const id = e.target.id;
+      spaceLayers.filter(s => s.id !== id).forEach(s => (s.selected = false));
+      console.log("select space " + id);
     });
 
-    spaceLayers.forEach(space => {
-      // Add to map
-      viewer.addLayer(space);
-
-      // Deselect other spaces and log space id when selected
-      space.on("select", e => {
-        const id = e.target.id;
-        spaceLayers.filter(s => s.id !== id).forEach(s => (s.selected = false));
-        console.log("select space " + id);
-      });
-
-      // Log space id when deselected
-      space.on("deselect", e => {
-        const id = e.target.id;
-        console.log("deselect space " + id);
-      });
-    });
-
-    // Create selectable seat layer
-    // Seats are shown as circles with 500mm radius
-    // Seat styles are specified using the style function
-    const seatLayers = seats.map(s => {
-      const circle = L.circle(L.latLng(s.y, s.x), {
-        radius: 500,
-        pane: "seats"
-      });
-      return new Element(s.id.toString(), [circle], {
-        selectable: true,
-        styleFunction: e => ({
-          color: e.selected ? "#f00" : "#666",
-          weight: e.selected ? 2 : 1,
-          opacity: 1,
-          fillColor: e.selected ? "#faa" : "#ccc",
-          fillOpacity: 1,
-          pane: "seats"
-        })
-      });
-    });
-
-    seatLayers.forEach(seat => {
-      // Add to map
-      viewer.addLayer(seat);
-
-      // Deselect other seats and log seat id when selected
-      seat.on("select", e => {
-        const id = e.target.id;
-        seatLayers.filter(s => s.id !== id).forEach(s => (s.selected = false));
-        console.log("select seat " + id);
-      });
-
-      // Log seat id when deselected
-      seat.on("deselect", e => {
-        const id = e.target.id;
-        console.log("deselect seat " + id);
-      });
+    // Log space id when deselected
+    space.on("deselect", e => {
+      const id = e.target.id;
+      console.log("deselect space " + id);
     });
   });
 
-  interface FloorGraphics {
-    dimensions: Dimensions;
-    graphicsLayers: GraphicsLayer[];
-    spaceGraphics: SpaceGraphics[];
-    scale: number;
-  }
+  // Create selectable seat layer
+  // Seats are shown as circles with 500mm radius
+  // Seat styles are specified using the style function
+  const seatLayers = seats.map(s => {
+    const circle = L.circle(L.latLng(s.y, s.x), {
+      radius: 500,
+      pane: "seats"
+    });
+    return new Element(s.id.toString(), [circle], {
+      selectable: true,
+      styleFunction: e => ({
+        color: e.selected ? "#f00" : "#666",
+        weight: e.selected ? 2 : 1,
+        opacity: 1,
+        fillColor: e.selected ? "#faa" : "#ccc",
+        fillOpacity: 1,
+        pane: "seats"
+      })
+    });
+  });
 
-  interface SpaceGraphics {
-    id: string;
-    boundaries: Boundary[];
-  }
+  seatLayers.forEach(seat => {
+    // Add to map
+    viewer.addLayer(seat);
 
-  interface List<TItem> {
-    items: TItem[];
-  }
+    // Deselect other seats and log seat id when selected
+    seat.on("select", e => {
+      const id = e.target.id;
+      seatLayers.filter(s => s.id !== id).forEach(s => (s.selected = false));
+      console.log("select seat " + id);
+    });
 
-  interface Seat {
-    id: number;
-    x: number;
-    y: number;
-  }
+    // Log seat id when deselected
+    seat.on("deselect", e => {
+      const id = e.target.id;
+      console.log("deselect seat " + id);
+    });
+  });
 }
