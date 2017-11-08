@@ -9,7 +9,7 @@ const redirectUri = document.location.href.split("?")[0];
 /**
  * Gets access token from local storage, by requesting new token,
  * or by reading authorization code from URL parameter.
- * Returns null if no valid token can be returned.
+ * Throws error if no valid token can be returned.
  */
 export async function getAccessToken(): Promise<string> {
   const accessToken = window.localStorage.getItem("access_token");
