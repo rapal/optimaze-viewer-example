@@ -12,6 +12,6 @@ This app is hosted at
 ## Usage
 
 1. Run `yarn` to install dependencies
-2. Run `yarn start` to start dev server
+1. Run `yarn start` to start dev server
 
 Alternatively, run `yarn build` to create a production build
