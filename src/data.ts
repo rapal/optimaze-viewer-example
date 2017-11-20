@@ -1,3 +1,4 @@
+import { format } from "date-fns";
 import { apiUrl } from "./config";
 import { getAccessToken, logout } from "./authentication";
 import {
@@ -7,25 +8,35 @@ import {
   TileCoordinates
 } from "@rapal/optimaze-viewer";
 
-export async function getFloorGraphics(companyId: number, floorId: string) {
-  const url = `${apiUrl}/${companyId}/floors/${floorId}/graphics`;
+export async function getFloorGraphics(
+  companyId: number,
+  floorId: string,
+  date: Date
+) {
+  const url =
+    `${apiUrl}/${companyId}/floors/${floorId}/graphics` +
+    `?date=${format(date)}`;
   return getJson<FloorGraphics>(url);
 }
 
-export async function getSeats(companyId: number, floorId: string) {
-  const url = `${apiUrl}/${companyId}/seats?floorId=${floorId}`;
+export async function getSeats(companyId: number, floorId: string, date: Date) {
+  const url = `${apiUrl}/${companyId}/seats?floorId=${floorId}&date=${format(
+    date
+  )}`;
   return getJson<List<Seat>>(url);
 }
 
 export async function getTile(
   companyId: number,
   floorId: string,
+  date: Date,
   layer: GraphicsLayer,
   coordinates: TileCoordinates
 ): Promise<string> {
   const url =
     `${apiUrl}/${companyId}/floors/${floorId}/tiles?` +
-    `layer=${layer}&x=${coordinates.x}&y=${coordinates.y}&z=${coordinates.z}`;
+    `date=${format(date)}&layer=${layer}` +
+    `&x=${coordinates.x}&y=${coordinates.y}&z=${coordinates.z}`;
   return getJson<string>(url);
 }
 

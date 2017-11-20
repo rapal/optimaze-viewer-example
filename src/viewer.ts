@@ -9,10 +9,10 @@ import {
 } from "@rapal/optimaze-viewer";
 import { getFloorGraphics, getSeats, getTile } from "./data";
 
-export async function loadViewer(companyId: number, floorId: string) {
+export async function loadViewer(companyId: number, floorId: string, date: Date) {
   const values = await Q.all([
-    getFloorGraphics(companyId, floorId),
-    getSeats(companyId, floorId)
+    getFloorGraphics(companyId, floorId, date),
+    getSeats(companyId, floorId, date)
   ]);
 
   const floor = values[0];
@@ -23,7 +23,7 @@ export async function loadViewer(companyId: number, floorId: string) {
   function addLayer(layer: GraphicsLayer) {
     if (floor.graphicsLayers.filter(l => l === layer).length > 0) {
       const architectLayer = new FunctionalTileLayer(
-        coordinates => getTile(companyId, floorId, layer, coordinates),
+        coordinates => getTile(companyId, floorId, date, layer, coordinates),
         viewer.dimensions
       );
       viewer.addLayer(architectLayer);
