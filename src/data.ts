@@ -15,14 +15,12 @@ export async function getFloorGraphics(
 ) {
   const url =
     `${apiUrl}/${companyId}/floors/${floorId}/graphics` +
-    `?date=${format(date)}`;
+    `?date=${format(date, "YYYY-MM-DD")}`;
   return getJson<FloorGraphics>(url);
 }
 
-export async function getSeats(companyId: number, floorId: string, date: Date) {
-  const url = `${apiUrl}/${companyId}/seats?floorId=${floorId}&date=${format(
-    date
-  )}`;
+export async function getSeats(companyId: number, floorId: string) {
+  const url = `${apiUrl}/${companyId}/seats?floorId=${floorId}`;
   return getJson<List<Seat>>(url);
 }
 
@@ -35,7 +33,7 @@ export async function getTile(
 ): Promise<string> {
   const url =
     `${apiUrl}/${companyId}/floors/${floorId}/tiles?` +
-    `date=${format(date)}&layer=${layer}` +
+    `date=${format(date, "YYYY-MM-DD")}&layer=${layer}` +
     `&x=${coordinates.x}&y=${coordinates.y}&z=${coordinates.z}`;
   return getJson<string>(url);
 }

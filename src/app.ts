@@ -9,6 +9,7 @@ import "./app.css";
 const companyId = 1361;
 const floorId = "m2033670";
 const date = startOfToday();
+// const date = new Date(2010, 1, 1);
 
 getAccessToken().then(
   () => {
