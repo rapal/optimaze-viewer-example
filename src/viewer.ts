@@ -12,7 +12,7 @@ import { getFloorGraphics, getSeats, getTile } from "./data";
 export async function loadViewer(companyId: number, floorId: string, date: Date) {
   const values = await Q.all([
     getFloorGraphics(companyId, floorId, date),
-    getSeats(companyId, floorId)
+    getSeats(companyId, floorId, date)
   ]);
 
   const floor = values[0];

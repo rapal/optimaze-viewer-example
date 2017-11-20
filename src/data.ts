@@ -19,8 +19,10 @@ export async function getFloorGraphics(
   return getJson<FloorGraphics>(url);
 }
 
-export async function getSeats(companyId: number, floorId: string) {
-  const url = `${apiUrl}/${companyId}/seats?floorId=${floorId}`;
+export async function getSeats(companyId: number, floorId: string, date: Date) {
+  const url =
+    `${apiUrl}/${companyId}/seats?floorId=${floorId}` +
+    `&date=${format(date, "YYYY-MM-DD")}`;
   return getJson<List<Seat>>(url);
 }
 
