@@ -21,7 +21,7 @@ export async function loadViewer(companyId: number, floorId: string) {
   const viewer = new Viewer("viewer", floor.dimensions);
 
   function addLayer(layer: GraphicsLayer) {
-    if (floor.graphicsLayers.filter(l => l === layer)) {
+    if (floor.graphicsLayers.filter(l => l === layer).length > 0) {
       const architectLayer = new FunctionalTileLayer(
         coordinates => getTile(companyId, floorId, layer, coordinates),
         viewer.dimensions
