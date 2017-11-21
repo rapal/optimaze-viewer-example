@@ -5,8 +5,9 @@
     "moduleResolution": "node",
     "strictNullChecks": true,
     "lib": [
-      "es2015",
-      "dom"
+      "es2015.promise",
+      "dom",
+      "es5"
     ]
   }
 }
