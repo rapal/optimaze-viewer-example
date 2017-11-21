@@ -2,7 +2,7 @@ import { loadViewer } from "./viewer";
 import { getAccessToken, showUserInfo, showLogin } from "./authentication";
 
 // Polyfills
-import "core-js";
+import "core-js/es6/promise";
 import "whatwg-fetch";
 import "url-search-params-polyfill";
 
