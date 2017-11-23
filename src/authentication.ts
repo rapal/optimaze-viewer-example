@@ -108,7 +108,7 @@ async function refreshAccessToken(refreshToken: string) {
  * Throws error if response is not ok.
  */
 async function fetchToken<TData>(url: string, params: URLSearchParams) {
-  // params.toString() and explicit content-tyype header neccessary for whatwg-fetch polyfill
+  // params.toString() and explicit content-type header neccessary for whatwg-fetch polyfill
   const response = await fetch(url, {
     method: "POST",
     body: params.toString(),
