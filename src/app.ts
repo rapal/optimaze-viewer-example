@@ -2,6 +2,11 @@ import { startOfToday } from "date-fns";
 import { loadViewer } from "./viewer";
 import { getAccessToken, showUserInfo, showLogin } from "./authentication";
 
+// Polyfills
+import "core-js/es6/promise";
+import "whatwg-fetch";
+import "url-search-params-polyfill";
+
 import "leaflet/dist/leaflet.css";
 import "./app.css";
 
