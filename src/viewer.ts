@@ -1,5 +1,4 @@
 import * as L from "leaflet";
-import * as Q from "q";
 import {
   Viewer,
   Space,
@@ -10,7 +9,7 @@ import {
 import { getFloorGraphics, getSeats, getTile } from "./data";
 
 export async function loadViewer(companyId: number, floorId: string) {
-  const values = await Q.all([
+  const values = await Promise.all([
     getFloorGraphics(companyId, floorId),
     getSeats(companyId, floorId)
   ]);

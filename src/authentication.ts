@@ -57,17 +57,15 @@ function getAuthorizationCode() {
  */
 async function getRefreshAndAccessTokens(authorizationCode: string) {
   const tokenUrl = oauthUrl + "/token";
-  const payload = new URLSearchParams();
-  payload.set("grant_type", "authorization_code");
-  payload.set("code", authorizationCode);
-  payload.set("redirect_uri", redirectUri);
-  payload.set("client_id", clientId);
-  payload.set("client_secret", clientSecret);
 
-  const json = await fetchJson<AuthorizationCodeResponse>(tokenUrl, {
-    method: "POST",
-    body: payload
-  });
+  const params = new URLSearchParams();
+  params.set("grant_type", "authorization_code");
+  params.set("code", authorizationCode);
+  params.set("redirect_uri", redirectUri);
+  params.set("client_id", clientId);
+  params.set("client_secret", clientSecret);
+
+  const json = await fetchToken<AuthorizationCodeResponse>(tokenUrl, params);
 
   window.localStorage.setItem("refresh_token", json.refresh_token);
   window.localStorage.setItem("access_token", json.access_token);
@@ -86,17 +84,15 @@ async function getRefreshAndAccessTokens(authorizationCode: string) {
  */
 async function refreshAccessToken(refreshToken: string) {
   const tokenUrl = oauthUrl + "/token";
-  const payload = new URLSearchParams();
-  payload.set("grant_type", "refresh_token");
-  payload.set("refresh_token", refreshToken);
-  payload.set("redirect_uri", redirectUri);
-  payload.set("client_id", clientId);
-  payload.set("client_secret", clientSecret);
 
-  const json = await fetchJson<RefreshTokenResponse>(tokenUrl, {
-    method: "POST",
-    body: payload
-  });
+  const params = new URLSearchParams();
+  params.set("grant_type", "refresh_token");
+  params.set("refresh_token", refreshToken);
+  params.set("redirect_uri", redirectUri);
+  params.set("client_id", clientId);
+  params.set("client_secret", clientSecret);
+
+  const json = await fetchToken<RefreshTokenResponse>(tokenUrl, params);
 
   window.localStorage.setItem("access_token", json.access_token);
   window.localStorage.setItem(
@@ -111,11 +107,14 @@ async function refreshAccessToken(refreshToken: string) {
  * Fetches and returns parsed json.
  * Throws error if response is not ok.
  */
-async function fetchJson<TData>(
-  input: RequestInfo,
-  init?: RequestInit | undefined
-) {
-  const response = await fetch(input, init);
+async function fetchToken<TData>(url: string, params: URLSearchParams) {
+  // params.toString() and explicit content-type header neccessary for whatwg-fetch polyfill
+  const response = await fetch(url, {
+    method: "POST",
+    body: params.toString(),
+    headers: [["Content-Type", "application/x-www-form-urlencoded;charset=UTF-8"]]
+  });
+
   if (response.ok) {
     const json: TData = await response.json();
     return json;
