@@ -13,8 +13,11 @@ import "./app.css";
 // Floor plan parameters
 const companyId = 1361;
 const floorId = "m2033670";
+
+// Set date for floor plan data
+// Note that date is optional in API requests
 const date = startOfToday();
-// const date = new Date(2010, 1, 1);
+// const date = new Date(2016, 8, 30);
 
 getAccessToken().then(
   () => {
