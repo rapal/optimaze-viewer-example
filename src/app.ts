@@ -1,4 +1,3 @@
-import { startOfToday } from "date-fns";
 import { loadViewer } from "./viewer";
 import { getAccessToken, showUserInfo, showLogin } from "./authentication";
 
@@ -16,8 +15,7 @@ const floorId = "m2033670";
 
 // Set date for floor plan data
 // Note that date is optional in API requests
-const date = startOfToday();
-// const date = new Date(2016, 8, 30);
+const date = new Date();
 
 getAccessToken().then(
   () => {
