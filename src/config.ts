@@ -1,4 +1,3 @@
-// TODO: Replace with production URL once API is published
 export const apiUrl = "https://space.optimaze.net/api/public/v1";
 export const oauthUrl = "https://portal.optimaze.net/oauth";
 export const clientId = "optimaze-viewer-example";
