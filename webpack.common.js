@@ -2,6 +2,7 @@ const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
+const TSLintPlugin = require("tslint-webpack-plugin");
 
 module.exports = {
   entry: "./src/app.ts",
@@ -16,6 +17,9 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: "./src/index.html",
       hash: true
+    }),
+    new TSLintPlugin({
+      files: ["./src/**/*.ts"]
     })
   ],
   resolve: {
