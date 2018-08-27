@@ -4,11 +4,16 @@ import {
   Space,
   Element,
   GraphicsLayer,
-  FunctionalTileLayer
+  FunctionalTileLayer,
+  FixedCircle
 } from "@rapal/optimaze-viewer";
 import { getFloorGraphics, getSeats, getTile } from "./data";
 
-export async function loadViewer(companyId: number, floorId: string, date: Date) {
+export async function loadViewer(
+  companyId: number,
+  floorId: string,
+  date: Date
+) {
   const values = await Promise.all([
     getFloorGraphics(companyId, floorId, date),
     getSeats(companyId, floorId, date)
@@ -70,7 +75,8 @@ export async function loadViewer(companyId: number, floorId: string, date: Date)
   // Seats are shown as circles with 500mm radius
   // Seat styles are specified using the style function
   const seatLayers = seats.map(s => {
-    const circle = L.circle(L.latLng(s.y, s.x), {
+    // Use FixedCircle instead of L.Circle to prevent radius rounding bug
+    const circle = new FixedCircle(L.latLng(s.y, s.x), {
       radius: 500,
       pane: "seats"
     });

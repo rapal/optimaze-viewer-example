@@ -9,32 +9,34 @@
     "url": "https://github.com/rapal/optimaze-viewer-example"
   },
   "scripts": {
-    "start": "yarn run lint && webpack-dev-server",
-    "build": "yarn run lint && rimraf build && webpack -p --env production",
-    "lint": "tslint --config tslint.json --project tsconfig.json"
+    "start": "webpack-dev-server --config webpack.dev.js",
+    "build": "webpack --config webpack.prod.js"
   },
   "devDependencies": {
-    "css-loader": "^0.28.7",
-    "extract-text-webpack-plugin": "^3.0.0",
-    "file-loader": "^1.1.5",
-    "html-webpack-plugin": "^2.30.1",
+    "clean-webpack-plugin": "^0.1.19",
+    "css-loader": "^1.0.0",
+    "file-loader": "^2.0.0",
+    "html-webpack-plugin": "^3.2.0",
+    "mini-css-extract-plugin": "^0.4.2",
     "path": "^0.12.7",
-    "rimraf": "^2.6.2",
-    "ts-loader": "^3.1.0",
+    "ts-loader": "^4.5.0",
     "tslint": "^5.7.0",
-    "typescript": "^2.5.2",
-    "webpack": "^3.6.0",
-    "webpack-dev-server": "^2.9.3"
+    "tslint-webpack-plugin": "^1.2.2",
+    "typescript": "^3.0.1",
+    "webpack": "^4.17.1",
+    "webpack-cli": "^3.1.0",
+    "webpack-dev-server": "^3.1.5",
+    "webpack-merge": "^4.1.4"
   },
   "dependencies": {
-    "@rapal/optimaze-viewer": "^0.3.0",
+    "@rapal/optimaze-viewer": "^0.4.0",
     "@types/jwt-decode": "^2.2.1",
     "@types/leaflet": "^1.2.0",
     "core-js": "^2.5.1",
     "date-fns": "^1.29.0",
     "jwt-decode": "^2.2.0",
     "leaflet": "^1.2.0",
-    "url-search-params-polyfill": "^2.0.1",
+    "url-search-params-polyfill": "^4.0.1",
     "whatwg-fetch": "^2.0.3"
   }
 }
