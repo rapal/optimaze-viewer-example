@@ -19,11 +19,11 @@ export async function getFloorGraphics(
   return getJson<FloorGraphics>(url);
 }
 
-export async function getSeats(companyId: number, floorId: string, date: Date) {
+export async function getCapacityObjects(companyId: number, floorId: string, date: Date) {
   const url =
-    `${apiUrl}/${companyId}/seats?floorId=${floorId}` +
+    `${apiUrl}/${companyId}/capacityobjects?floorId=${floorId}` +
     `&date=${format(date, "YYYY-MM-DD")}`;
-  return getJson<List<Seat>>(url);
+  return getJson<List<CapacityObject>>(url);
 }
 
 export async function getTile(
@@ -78,7 +78,7 @@ interface List<TItem> {
   items: TItem[];
 }
 
-interface Seat {
+interface CapacityObject {
   id: number;
   x: number;
   y: number;

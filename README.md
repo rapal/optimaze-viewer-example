@@ -15,3 +15,8 @@ This app is hosted at
 1. Run `yarn start` to start dev server
 
 Alternatively, run `yarn build` to create a production build
+
+## Debugging
+
+1. If you get "not found" from the floorgraphics api call, the spacedata / floor images might be missing
+2. If you get "bad request" from authorization, check that your api-user (optimaze-viewer-example by defaul) has proper scope (space.read) and password auth flow enabled
