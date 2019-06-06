@@ -7,20 +7,22 @@ import {
   FunctionalTileLayer,
   FixedCircle
 } from "@rapal/optimaze-viewer";
-import { getFloorGraphics, getSeats, getTile } from "./data";
+import { getFloorGraphics, getCapacityObjects, getTile } from "./data";
 
 export async function loadViewer(
   companyId: number,
   floorId: string,
   date: Date
 ) {
+  const test = await Promise.all([getFloorGraphics(companyId, floorId, date)]);
+
   const values = await Promise.all([
     getFloorGraphics(companyId, floorId, date),
-    getSeats(companyId, floorId, date)
+    getCapacityObjects(companyId, floorId, date)
   ]);
 
   const floor = values[0];
-  const seats = values[1].items;
+  const capacityobjects = values[1].items;
 
   const viewer = new Viewer("viewer", floor.dimensions);
 
@@ -41,7 +43,7 @@ export async function loadViewer(
   // Creating custom panes is not neccessary, but makes sure
   // that elements of the same type are shown at the same z-index
   viewer.createPane("spaces").style.zIndex = "405";
-  viewer.createPane("seats").style.zIndex = "410";
+  viewer.createPane("capacityobjects").style.zIndex = "410";
 
   // Create selectable space layers
   const spaceLayers = floor.spaceGraphics.map(s => {
@@ -71,14 +73,14 @@ export async function loadViewer(
     });
   });
 
-  // Create selectable seat layer
-  // Seats are shown as circles with 500mm radius
-  // Seat styles are specified using the style function
-  const seatLayers = seats.map(s => {
+  // Create selectable capacityobject layer
+  // CapacityObjects are shown as circles with 500mm radius
+  // CapacityObject styles are specified using the style function
+  const capacityObjectLayers = capacityobjects.map(s => {
     // Use FixedCircle instead of L.Circle to prevent radius rounding bug
     const circle = new FixedCircle(L.latLng(s.y, s.x), {
       radius: 500,
-      pane: "seats"
+      pane: "capacityobjects"
     });
     return new Element(s.id.toString(), [circle], {
       selectable: true,
@@ -88,26 +90,26 @@ export async function loadViewer(
         opacity: 1,
         fillColor: e.selected ? "#faa" : "#ccc",
         fillOpacity: 1,
-        pane: "seats"
+        pane: "capacityobjects"
       })
     });
   });
 
-  seatLayers.forEach(seat => {
+  capacityObjectLayers.forEach(capacityObject => {
     // Add to map
-    viewer.addLayer(seat);
+    viewer.addLayer(capacityObject);
 
-    // Deselect other seats and log seat id when selected
-    seat.on("select", e => {
+    // Deselect other capacityobjects and log capacityobject id when selected
+    capacityObject.on("select", e => {
       const id = e.target.id;
-      seatLayers.filter(s => s.id !== id).forEach(s => (s.selected = false));
-      console.log("select seat " + id);
+      capacityObjectLayers.filter(s => s.id !== id).forEach(s => (s.selected = false));
+      console.log("select capacityObject " + id);
     });
 
-    // Log seat id when deselected
-    seat.on("deselect", e => {
+    // Log capacityobject id when deselected
+    capacityObject.on("deselect", e => {
       const id = e.target.id;
-      console.log("deselect seat " + id);
+      console.log("deselect capacityObject " + id);
     });
   });
 }
