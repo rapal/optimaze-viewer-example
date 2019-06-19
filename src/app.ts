@@ -10,7 +10,7 @@ import "leaflet/dist/leaflet.css";
 import "./app.css";
 
 // Floor plan parameters
-const companyId = 1361;
+const companyId = 1249;
 const floorId = "m2033670";
 
 // Set date for floor plan data
